@@ -29,9 +29,53 @@ using namespace std;
 class StoreCredit
 {
 	private:
-		int C, I, *P;
+		int N, C, I, *P;
+		int output1, output2, index1, index2;
+		
+		bool thereisP()
+		{
+			if( sizeof(P) == 0 )
+				return false;
+			else
+				return true;
+		}
 	
 	public:
+		void return_outputs()
+		{
+			if( output1 != 0 && output2 != 0 )
+			{
+				cout << "Case #" << N+1 << ": " << index1 << " " << index2 << endl;
+			}
+		}
+		
+		void finditem()
+		{
+			int sumC;
+			int first_item, second_item;
+			
+			if( thereisP() )
+			{
+				for( int i=0; i < I; i++ )
+				{
+					first_item = P[i];
+					for( int j=i+1; j < I; j++ )
+					{
+						second_item = P[j];
+						sumC = first_item + second_item;
+						
+						if( sumC == C )
+						{
+							output1 = first_item;
+							output2 = second_item;
+							index1 = i+1;
+							index2 = j+1;
+						}
+					}
+				}
+			}
+		}		
+		
 		void input( int Cost, int Item )
 		{
 			C = Cost;
@@ -48,6 +92,20 @@ class StoreCredit
 			P = new int[Item];
 			
 			for ( int i=0; i<Item; i++ )
+			{
+				P[i] = Price[i];
+			}
+		}
+		
+		void input( int Num, int Cost, int Item, int Price[] )
+		{
+			N = Num;
+			C = Cost;
+			I = Item;
+			
+			P = new int[Item];
+			
+			for ( int i=0; i < Item; i++ )
 			{
 				P[i] = Price[i];
 			}
@@ -73,7 +131,7 @@ class StoreCredit
 		
 		~StoreCredit()
 		{
-			delete P;
+			delete [] P;
 		}
 
 } store;
@@ -88,14 +146,14 @@ int main(int argc, char **argv)
 	StoreCredit *store;
 
 	//read file data
-	ifstream myfile ("A-small-practice.in");
+	ifstream myfile ("A-large-practice.in");
 	if ( myfile.is_open() )
 	{
 		//read total number of cases
 		myfile >> N;
 		store = new StoreCredit[N];
 		
-		for( int i=0; !myfile.eof(); i++ )
+		for( int i=0; i<N; i++ )
 		{
 			//read Cost and Item
 			myfile >> C >> I;
@@ -106,14 +164,28 @@ int main(int argc, char **argv)
 			//read prices
 			for( int j=0; j<I; j++ )
 				myfile >> P[j];
-		
-			store[i].input( C, I, P );
+			
+			store[i].input( i, C, I, P );
 			
 			delete [] P;
 		}
 	}	
 
+	// calculate data
+	for( int i=0; i < N; i++ )
+	{
+		store[i].finditem();
+		store[i].return_outputs();
+	}
+	
 	myfile.close();
+	
+	// delete class
+	for( int i=0; i < N; i++ )
+	{
+		store[i].~StoreCredit();
+	}
+	
 	return 0;
 }
 
